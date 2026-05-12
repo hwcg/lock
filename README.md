@@ -11,7 +11,7 @@
 - **分布式训练**：原生支持 DDP、DeepSpeed (ZeRO 1/2/3)，可单机单卡到单机多卡无缝切换。
 - **可视化与调度**：wandb / swanlab 双后端，支持动态启停（信号驱动）。
 - **完整评测**：C-Eval / C-MMLU / OpenBookQA / HumanEval / GSM8K。
-- **长文本外推**：内置 YaRN 实现，支持 65K → 1M 长上下文。
+- **长文本支持**：原生 YaRN 实现，训练时即支持 1M 上下文（`max_position_embeddings=1048576`）。
 - **OpenAI API 兼容**：极简服务端，支持 `reasoning_content` / `tool_calls` / `open_thinking`，可接入 FastGPT / Open-WebUI。
 
 ## 快速开始
