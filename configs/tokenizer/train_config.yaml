@@ -1,0 +1,30 @@
+# Tokenizer 训练配置
+tokenizer:
+  vocab_size: 129280
+  algorithm: "bpe"                # bpe | unigram
+  byte_fallback: true             # 启用 byte-level fallback（保证零未知 token）
+  normalizer: "nfc"               # nfc | nfkc | null
+  character_coverage: 0.9995      # SP 算法字符覆盖率（unigram 用）
+  min_frequency: 2
+  pre_tokenizer: "v4"             # 自定义 V4 风格 split
+  add_prefix_space: false
+
+# 训练数据
+data:
+  files:
+    # 中英混合，公开数据集
+    - { source: "huggingface", name: "wikipedia",        config: "20231101.zh",   split: "train", sample_size: 500000 }
+    - { source: "huggingface", name: "wikipedia",        config: "20231101.en",   split: "train", sample_size: 500000 }
+    - { source: "huggingface", name: "BelleGroup/train_3.5M_CN", config: null,    split: "train", sample_size: 1000000 }
+    - { source: "huggingface", name: "code_search_net",  config: "all",           split: "train", sample_size: 200000 }
+    - { source: "huggingface", name: "openai/gsm8k",     config: "main",          split: "train", sample_size: null }
+  text_column: "text"             # 用于 wikipedia 等
+  shuffle_buffer: 10000
+  seed: 42
+
+output:
+  output_dir: "checkpoints/tokenizer"
+  save_format: ["sentencepiece", "huggingface"]
+
+# 并行
+num_workers: 16

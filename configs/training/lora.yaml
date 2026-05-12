@@ -1,0 +1,88 @@
+# DeepSeek-V4 Mini LoRA-SFT 配置
+
+output_dir: "checkpoints/lora-sft"
+run_name: "ds4-mini-lora-v1"
+project_name: "deepseek-v4-mini"
+
+# 数据
+train_data_paths:
+  - "data/processed/sft.jsonl"
+eval_data_paths: []
+max_seq_len: 4096
+cache_dir: "cache/datasets"
+thinking_mode_default: "chat"
+mask_user: true
+
+# 模型
+model_config_path: "configs/model/mini_2b.json"
+tokenizer_path: "checkpoints/tokenizer"
+init_from_checkpoint: "checkpoints/sft/checkpoint-final"
+
+# 训练超参
+seed: 42
+max_steps: 3000
+micro_batch_size: 4
+gradient_accumulation_steps: 8
+log_steps: 10
+eval_steps: 500
+save_steps: 500
+
+# 优化器（LoRA 用更大 lr）
+optimizer: "adamw"
+learning_rate: 1.0e-4
+weight_decay: 0.0
+adam_beta1: 0.9
+adam_beta2: 0.999
+max_grad_norm: 1.0
+
+scheduler: "cosine"
+warmup_steps: 100
+min_lr_ratio: 0.1
+
+# 精度
+precision: "bf16"
+gradient_checkpointing: true
+
+# 分布式
+use_deepspeed: false
+
+# Checkpoint
+keep_last: 3
+keep_best: 2
+metric_name: "eval_loss"
+metric_mode: "min"
+save_format: "safetensors"
+resume_from_checkpoint: null
+
+# Logger
+logger_backends: ["jsonl", "wandb"]
+
+# SFT
+z_loss_weight: 0.0
+aux_loss_weight: 0.0
+use_aux_loss: false
+loss_reduction: "token"
+neftune_alpha: 0.0
+
+# LoRA
+save_full_model: false
+save_adapter_only: true
+
+lora:
+  r: 16
+  lora_alpha: 32.0
+  lora_dropout: 0.05
+  bias: "none"
+  use_dora: false
+  use_rslora: false
+  init_lora_weights: true
+  target_experts: false
+  target_grouped: true
+  target_router: false
+  target_modules:
+    - "q_a_proj"
+    - "q_b_proj"
+    - "kv_proj"
+    - "o_b_proj"
+    - "o_a_proj"          # GroupedLinear
+  modules_to_save: []

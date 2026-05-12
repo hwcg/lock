@@ -1,0 +1,94 @@
+# DeepSeek-V4 Mini 预训练配置（参考值）
+
+# ============ 输出 ============
+output_dir: "checkpoints/pretrain"
+run_name:   "ds4-mini-pt-v1"
+project_name: "deepseek-v4-mini"
+
+# ============ 数据 ============
+train_data_paths:
+  - "data/processed/pretrain.jsonl"
+eval_data_paths:
+  - "data/processed/pretrain_val.jsonl"   # 可选
+text_field: "text"
+max_seq_len: 4096
+use_packed_dataset: true
+cache_dir: "cache/datasets"
+
+# ============ 模型 / 分词器 ============
+model_config_path: "configs/model/mini_2b.json"
+tokenizer_path: "checkpoints/tokenizer"
+init_from_checkpoint: null
+
+# ============ 训练超参 ============
+seed: 42
+max_steps: 100000
+max_epochs: null
+micro_batch_size: 4
+gradient_accumulation_steps: 8
+log_steps: 10
+eval_steps: 1000
+save_steps: 1000
+eval_max_batches: 100
+
+# ============ 优化器 ============
+optimizer: "adamw"          # adamw | muon
+learning_rate: 3.0e-4
+weight_decay: 0.1
+adam_beta1: 0.9
+adam_beta2: 0.95
+adam_eps: 1.0e-8
+max_grad_norm: 1.0
+
+# ============ Scheduler ============
+scheduler: "cosine"         # cosine | linear | wsd | ...
+warmup_steps: 2000
+min_lr_ratio: 0.1
+wsd_decay_ratio: 0.1
+
+# ============ 精度 ============
+precision: "bf16"            # fp32 | fp16 | bf16
+grad_scaler_enabled: null
+
+# ============ Gradient Checkpointing ============
+gradient_checkpointing: true
+gc_skip_first_n: 0
+gc_skip_last_n: 0
+
+# ============ DataLoader ============
+num_workers: 4
+pin_memory: true
+drop_last: true
+
+# ============ 分布式 ============
+distributed_backend: "nccl"
+use_deepspeed: false
+deepspeed_config: "configs/deepspeed/zero2.json"
+
+# ============ Checkpoint ============
+keep_last: 3
+keep_best: 2
+metric_name: "eval_loss"
+metric_mode: "min"
+save_format: "safetensors"
+resume_from_checkpoint: "auto"     # auto | path | null
+
+# ============ Logging ============
+logger_backends: ["jsonl", "wandb"]
+log_dir: null
+enable_signal_control: true
+
+# ============ 损失 ============
+z_loss_weight: 1.0e-4
+aux_loss_weight: 0.01
+aux_loss_topk: 4
+use_aux_loss: true
+
+# ============ MFU ============
+estimate_mfu: true
+gpu_peak_flops: 312.0e12      # A100 BF16
+
+# ============ 其他 ============
+deterministic: false
+compile_model: false
+print_param_count: true

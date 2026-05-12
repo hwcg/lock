@@ -1,0 +1,23 @@
+# 训练镜像（基于 PyTorch 官方 + CUDA 12.1）
+FROM pytorch/pytorch:2.3.1-cuda12.1-cudnn8-devel
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        git build-essential ca-certificates curl wget && \
+    rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workspace
+COPY pyproject.toml requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# 安装 deepspeed（pip 装比基础镜像里快）
+RUN pip install --no-cache-dir deepspeed==0.14.5
+
+COPY . .
+RUN pip install --no-cache-dir -e ".[train,dev]"
+
+# 默认入口：自定义命令
+CMD ["bash"]

@@ -1,0 +1,74 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+build/
+dist/
+.eggs/
+pip-wheel-metadata/
+.installed.cfg
+*.tar.gz
+
+# Virtual env
+.venv/
+venv/
+env/
+ENV/
+.python-version
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+
+# Test / Cov
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.tox/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+*.cover
+
+# Project artifacts
+checkpoints/
+exports/
+data/raw/
+data/cleaned/
+data/processed/
+cache/
+logs/
+eval_results/
+needle_results/
+wandb/
+swanlog/
+
+# 大文件
+*.safetensors
+*.bin
+*.pt
+*.pth
+*.gguf
+*.onnx
+*.tflite
+
+# Tokenizer 训练产物允许（小，提交方便）
+!checkpoints/tokenizer/vocab.json
+!checkpoints/tokenizer/merges.txt
+!checkpoints/tokenizer/special_tokens_map.json
+!checkpoints/tokenizer/tokenizer_config.json
+
+# Logs
+*.log
+
+# Local config
+.env
+.env.local
+local_config.yaml

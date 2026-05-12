@@ -1,0 +1,58 @@
+# DeepSeek-V4 Mini Agentic RL 训练配置
+
+output_dir: "checkpoints/agentic_rl"
+run_name: "ds4-mini-agentic-rl-v1"
+project_name: "deepseek-v4-mini"
+
+train_data_paths:
+  - "data/processed/sft_with_answers.jsonl"
+reference_field: "answer"
+max_prompt_len: 1024
+max_seq_len: 4096
+
+model_config_path: "configs/model/mini_2b.json"
+tokenizer_path: "checkpoints/tokenizer"
+init_from_checkpoint: "checkpoints/tool_use/checkpoint-final"
+
+max_turns: 5
+final_answer_tool: null
+
+max_new_tokens: 256
+temperature: 1.0
+top_p: 1.0
+group_size: 4
+prompts_per_step: 4
+
+cliprange: 0.2
+beta_kl: 0.02
+ppo_epochs: 1
+advantage_eps: 1.0e-8
+kl_estimator: "k3"
+
+reward_correctness_weight: 1.0
+reward_format_weight: 0.1
+reward_efficiency_weight: 0.1
+max_efficient_turns: 3
+
+num_iters: 500
+save_iters: 25
+
+optimizer: "adamw"
+learning_rate: 5.0e-7
+weight_decay: 0.0
+max_grad_norm: 1.0
+scheduler: "cosine"
+warmup_steps: 50
+min_lr_ratio: 0.1
+
+precision: "bf16"
+gradient_checkpointing: true
+use_deepspeed: false
+micro_batch_size: 1
+
+keep_last: 3
+keep_best: 2
+metric_name: "reward/mean"
+metric_mode: "max"
+save_format: "safetensors"
+logger_backends: ["jsonl", "wandb"]

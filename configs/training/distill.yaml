@@ -1,0 +1,58 @@
+# DeepSeek-V4 Mini 蒸馏训练配置
+
+output_dir: "checkpoints/distill"
+run_name: "ds4-mini-distill-v1"
+project_name: "deepseek-v4-mini"
+
+train_data_paths:
+  - "data/processed/sft.jsonl"
+eval_data_paths: []
+dataset_type: "sft"
+max_seq_len: 4096
+cache_dir: "cache/datasets"
+text_field: "text"
+
+# Student
+model_config_path: "configs/model/mini_2b.json"
+init_from_checkpoint: null
+tokenizer_path: "checkpoints/tokenizer"
+
+# Teacher
+teacher_config_path: "configs/model/mini_2b.json"
+teacher_checkpoint: "checkpoints/sft/checkpoint-final/model.safetensors"
+teacher_topk: 0
+
+# 蒸馏超参
+kd_type: "forward_kl"
+temperature: 2.0
+alpha_ce: 0.5
+jsd_alpha: 0.5
+
+seed: 42
+max_steps: 10000
+micro_batch_size: 2
+gradient_accumulation_steps: 16
+log_steps: 10
+eval_steps: 500
+save_steps: 500
+
+optimizer: "adamw"
+learning_rate: 1.0e-4
+weight_decay: 0.01
+adam_beta1: 0.9
+adam_beta2: 0.95
+max_grad_norm: 1.0
+scheduler: "cosine"
+warmup_steps: 200
+min_lr_ratio: 0.1
+
+precision: "bf16"
+gradient_checkpointing: true
+use_deepspeed: false
+
+keep_last: 3
+keep_best: 2
+metric_name: "eval_loss"
+metric_mode: "min"
+save_format: "safetensors"
+logger_backends: ["jsonl", "wandb"]

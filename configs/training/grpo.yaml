@@ -1,0 +1,75 @@
+# DeepSeek-V4 Mini GRPO 训练配置
+
+output_dir: "checkpoints/grpo"
+run_name: "ds4-mini-grpo-v1"
+project_name: "deepseek-v4-mini"
+
+# 数据：GSM8K 风格，messages + answer
+train_data_paths:
+  - "data/processed/sft_with_answers.jsonl"
+prompt_field: "messages"
+reference_field: "answer"
+max_prompt_len: 1024
+cache_dir: "cache/datasets"
+
+# 模型
+model_config_path: "configs/model/mini_2b.json"
+tokenizer_path: "checkpoints/tokenizer"
+init_from_checkpoint: "checkpoints/sft/checkpoint-final"
+
+# 生成
+max_new_tokens: 512
+temperature: 1.0
+top_p: 1.0
+top_k: 0
+group_size: 8
+prompts_per_step: 4
+gen_micro_batch_size: 8
+
+# GRPO
+cliprange: 0.2
+beta_kl: 0.04
+ppo_epochs: 1
+advantage_eps: 1.0e-8
+kl_estimator: "k3"
+
+num_iters: 1000
+save_iters: 50
+
+# Reward 组合
+rewards:
+  - name: "math_correctness"
+    weight: 1.0
+    params:
+      extractor: "auto"
+      correct_reward: 1.0
+      wrong_reward: 0.0
+      no_answer_reward: -0.5
+  - name: "thinking_format"
+    weight: 0.1
+    params:
+      require_think: true
+
+# 优化
+optimizer: "adamw"
+learning_rate: 1.0e-6
+weight_decay: 0.0
+max_grad_norm: 1.0
+scheduler: "cosine"
+warmup_steps: 50
+min_lr_ratio: 0.1
+
+# 精度
+precision: "bf16"
+gradient_checkpointing: true
+
+# 分布式
+use_deepspeed: false
+
+# Checkpoint
+keep_last: 3
+keep_best: 2
+metric_name: "rm/mean"
+metric_mode: "max"
+save_format: "safetensors"
+logger_backends: ["jsonl", "wandb"]

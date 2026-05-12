@@ -1,0 +1,47 @@
+# DeepSeek-V4 Mini 自适应思考训练配置
+
+output_dir: "checkpoints/adaptive_thinking"
+run_name: "ds4-mini-adaptive-think-v1"
+project_name: "deepseek-v4-mini"
+
+train_data_paths:
+  - "data/processed/adaptive_thinking.jsonl"
+eval_data_paths: []
+max_seq_len: 4096
+cache_dir: "cache/datasets"
+
+model_config_path: "configs/model/mini_2b.json"
+tokenizer_path: "checkpoints/tokenizer"
+init_from_checkpoint: "checkpoints/sft/checkpoint-final"
+
+router_strategy: "auto"
+default_mode: "chat"
+difficulty_threshold: 0.5
+
+seed: 42
+max_steps: 3000
+micro_batch_size: 2
+gradient_accumulation_steps: 16
+log_steps: 10
+eval_steps: 300
+save_steps: 300
+
+optimizer: "adamw"
+learning_rate: 1.0e-5
+weight_decay: 0.01
+adam_beta1: 0.9
+adam_beta2: 0.95
+max_grad_norm: 1.0
+scheduler: "cosine"
+warmup_steps: 100
+min_lr_ratio: 0.1
+
+precision: "bf16"
+gradient_checkpointing: true
+
+keep_last: 3
+keep_best: 2
+metric_name: "eval_loss"
+metric_mode: "min"
+save_format: "safetensors"
+logger_backends: ["jsonl", "wandb"]

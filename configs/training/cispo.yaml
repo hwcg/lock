@@ -1,0 +1,64 @@
+# DeepSeek-V4 Mini CISPO 训练配置
+
+output_dir: "checkpoints/cispo"
+run_name: "ds4-mini-cispo-v1"
+project_name: "deepseek-v4-mini"
+
+train_data_paths:
+  - "data/processed/sft_with_answers.jsonl"
+prompt_field: "messages"
+reference_field: "answer"
+max_prompt_len: 1024
+
+model_config_path: "configs/model/mini_2b.json"
+tokenizer_path: "checkpoints/tokenizer"
+init_from_checkpoint: "checkpoints/sft/checkpoint-final"
+
+max_new_tokens: 512
+temperature: 1.0
+top_p: 1.0
+top_k: 0
+group_size: 8
+prompts_per_step: 4
+gen_micro_batch_size: 8
+
+# CISPO 专属
+is_clip_high: 1.5
+is_clip_low: 0.0
+beta_kl: 0.0
+advantage_eps: 1.0e-8
+ppo_epochs: 1
+use_group_baseline: true
+kl_estimator: "k3"
+
+num_iters: 1000
+save_iters: 50
+
+rewards:
+  - name: "math_correctness"
+    weight: 1.0
+    params:
+      extractor: "auto"
+  - name: "thinking_format"
+    weight: 0.1
+    params:
+      require_think: true
+
+optimizer: "adamw"
+learning_rate: 1.0e-6
+weight_decay: 0.0
+max_grad_norm: 1.0
+scheduler: "cosine"
+warmup_steps: 50
+min_lr_ratio: 0.1
+
+precision: "bf16"
+gradient_checkpointing: true
+use_deepspeed: false
+
+keep_last: 3
+keep_best: 2
+metric_name: "rm/mean"
+metric_mode: "max"
+save_format: "safetensors"
+logger_backends: ["jsonl", "wandb"]

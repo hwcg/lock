@@ -1,0 +1,79 @@
+# DeepSeek-V4 Mini PPO 训练配置
+
+output_dir: "checkpoints/ppo"
+run_name: "ds4-mini-ppo-v1"
+project_name: "deepseek-v4-mini"
+
+# 数据
+train_data_paths:
+  - "data/processed/sft.jsonl"
+prompt_field: "messages"
+max_prompt_len: 1024
+cache_dir: "cache/datasets"
+
+# 模型
+model_config_path: "configs/model/mini_2b.json"
+tokenizer_path: "checkpoints/tokenizer"
+init_from_checkpoint: "checkpoints/sft/checkpoint-final"
+reward_model_path: "checkpoints/reward_model/checkpoint-final"
+share_value_backbone: true
+
+# 生成
+max_new_tokens: 256
+temperature: 1.0
+top_p: 1.0
+top_k: 0
+rollout_batch_size: 8
+gen_micro_batch_size: 4
+
+# PPO
+ppo_epochs: 4
+mini_batch_size: 2
+cliprange: 0.2
+cliprange_value: 0.2
+vf_coef: 0.1
+entropy_coef: 0.0
+gamma: 1.0
+gae_lambda: 0.95
+whiten_advantages: true
+target_kl_for_early_stop: 0.04
+
+# KL 控制
+kl_controller: "adaptive"
+init_kl_coef: 0.2
+target_kl: 0.1
+kl_horizon: 10000
+
+# Reward shape
+reward_clip: 5.0
+reward_normalize: true
+
+# 训练循环
+num_iters: 1000
+save_iters: 50
+
+# 优化
+optimizer: "adamw"
+learning_rate: 1.0e-6
+weight_decay: 0.0
+adam_beta1: 0.9
+adam_beta2: 0.95
+max_grad_norm: 1.0
+scheduler: "cosine"
+warmup_steps: 50
+min_lr_ratio: 0.1
+
+# 精度
+precision: "bf16"
+gradient_checkpointing: true
+
+# 分布式
+use_deepspeed: false
+
+# Checkpoint
+keep_last: 3
+keep_best: 2
+metric_name: "reward/mean"
+metric_mode: "max"
+save_format: "safetensors"
+logger_backends: ["jsonl", "wandb"]

@@ -1,0 +1,26 @@
+# 推理镜像（仅 CUDA runtime + serve 依赖）
+FROM pytorch/pytorch:2.3.1-cuda12.1-cudnn8-runtime
+
+ENV PYTHONUNBUFFERED=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        ca-certificates && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY pyproject.toml requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+RUN pip install --no-cache-dir -e ".[serve]"
+
+EXPOSE 8000
+
+# 模型文件通过 volume 挂载，不放入镜像
+ENV MODEL_PATH=/models/deepseek-v4-mini \
+    TOKENIZER_PATH=/models/tokenizer
+
+ENTRYPOINT ["python", "scripts/serve.py"]
+CMD ["--config", "configs/inference/server.yaml", \
+     "model_path=/models/deepseek-v4-mini", \
+     "tokenizer_path=/models/tokenizer"]

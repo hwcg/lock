@@ -1,0 +1,59 @@
+# DeepSeek-V4 Mini DPO 训练配置
+
+output_dir: "checkpoints/dpo"
+run_name: "ds4-mini-dpo-v1"
+project_name: "deepseek-v4-mini"
+
+# 数据
+train_data_paths:
+  - "data/processed/dpo.jsonl"
+eval_data_paths: []
+max_prompt_len: 1024
+max_seq_len: 2048
+cache_dir: "cache/datasets"
+
+# 模型
+model_config_path: "configs/model/mini_2b.json"
+tokenizer_path: "checkpoints/tokenizer"
+init_from_checkpoint: "checkpoints/sft/checkpoint-final"
+reference_checkpoint: null
+
+# 训练超参
+seed: 42
+max_steps: 2000
+micro_batch_size: 1
+gradient_accumulation_steps: 16
+log_steps: 10
+eval_steps: 200
+save_steps: 200
+
+# 优化器
+optimizer: "adamw"
+learning_rate: 5.0e-7
+weight_decay: 0.0
+adam_beta1: 0.9
+adam_beta2: 0.95
+max_grad_norm: 1.0
+
+scheduler: "cosine"
+warmup_steps: 100
+min_lr_ratio: 0.1
+
+# 精度
+precision: "bf16"
+gradient_checkpointing: true
+
+# 分布式 / Logger / Checkpoint
+use_deepspeed: false
+keep_last: 3
+keep_best: 2
+metric_name: "eval_loss"
+metric_mode: "min"
+save_format: "safetensors"
+resume_from_checkpoint: "auto"
+logger_backends: ["jsonl", "wandb"]
+
+# DPO 专属
+dpo_variant: "dpo"
+beta: 0.1
+label_smoothing: 0.0
